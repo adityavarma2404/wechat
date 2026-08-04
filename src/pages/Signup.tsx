@@ -1,4 +1,8 @@
+import type { ChangeEvent, SubmitEvent } from "react";
+import { useState } from "react";
+
 import {
+  Alert,
   Box,
   Button,
   Link,
@@ -7,8 +11,53 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { getApiErrorMessage, signupUser } from "../services/auth";
 
 export function Signup() {
+  const [formValues, setFormValues] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = event.target;
+
+    setFormValues((currentValues) => ({
+      ...currentValues,
+      [name]: value,
+    }));
+  }
+
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setErrorMessage("");
+    setSuccessMessage("");
+    setIsSubmitting(true);
+
+    try {
+      await signupUser(formValues);
+      setSuccessMessage("Account created successfully. You can log in now.");
+      setFormValues({
+        fullName: "",
+        email: "",
+        password: "",
+      });
+    } catch (error) {
+      setErrorMessage(
+        getApiErrorMessage(
+          error,
+          "Unable to create account. Please try again.",
+        ),
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -43,12 +92,20 @@ export function Signup() {
             </Typography>
           </Box>
 
-          <Stack component="form" spacing={2.25}>
+          <Stack component="form" spacing={2.25} onSubmit={handleSubmit}>
+            {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+            {successMessage && (
+              <Alert severity="success">{successMessage}</Alert>
+            )}
+
             <TextField
               fullWidth
               label="Full name"
               name="fullName"
               autoComplete="name"
+              value={formValues.fullName}
+              onChange={handleInputChange}
+              required
             />
             <TextField
               fullWidth
@@ -56,6 +113,9 @@ export function Signup() {
               name="email"
               type="email"
               autoComplete="email"
+              value={formValues.email}
+              onChange={handleInputChange}
+              required
             />
             <TextField
               fullWidth
@@ -63,16 +123,20 @@ export function Signup() {
               name="password"
               type="password"
               autoComplete="new-password"
+              value={formValues.password}
+              onChange={handleInputChange}
+              required
             />
 
             <Button
               fullWidth
+              disabled={isSubmitting}
               size="large"
               type="submit"
               variant="contained"
               sx={{ py: 1.25, textTransform: "none", fontWeight: 700 }}
             >
-              Sign up
+              {isSubmitting ? "Signing up..." : "Sign up"}
             </Button>
           </Stack>
 
