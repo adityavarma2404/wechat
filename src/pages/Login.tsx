@@ -14,6 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { getApiErrorMessage, loginUser } from "../services/auth";
+import { useNavigate } from "react-router-dom";
 
 export function Login() {
   const [formValues, setFormValues] = useState({
@@ -23,7 +24,8 @@ export function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+
+  const navigate = useNavigate();
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -41,7 +43,6 @@ export function Login() {
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage("");
-    setSuccessMessage("");
     setIsSubmitting(true);
 
     try {
@@ -53,14 +54,17 @@ export function Login() {
         storage.setItem("token", token);
       }
 
-      setSuccessMessage("Logged in successfully.");
       setFormValues({
         email: "",
         password: "",
       });
+      navigate("/home");
     } catch (error) {
       setErrorMessage(
-        getApiErrorMessage(error, "Unable to log in. Please check your details."),
+        getApiErrorMessage(
+          error,
+          "Unable to log in. Please check your details.",
+        ),
       );
     } finally {
       setIsSubmitting(false);
@@ -103,9 +107,6 @@ export function Login() {
 
           <Stack component="form" spacing={2.25} onSubmit={handleSubmit}>
             {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
-            {successMessage && (
-              <Alert severity="success">{successMessage}</Alert>
-            )}
 
             <TextField
               fullWidth
