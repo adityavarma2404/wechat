@@ -1,6 +1,5 @@
 import axios from "axios";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+import { publicApi } from "./api";
 
 export type SignupPayload = {
   fullName: string;
@@ -13,12 +12,30 @@ export type LoginPayload = {
   password: string;
 };
 
+export type User = {
+  _id: number | string;
+  email: string;
+};
+
+export type AuthResponse = {
+  accessToken: string;
+  user: User;
+};
+
 export function signupUser(payload: SignupPayload) {
-  return axios.post(`${API_BASE_URL}/api/auth/signup`, payload);
+  return publicApi.post("/api/auth/signup", payload);
 }
 
 export function loginUser(payload: LoginPayload) {
-  return axios.post(`${API_BASE_URL}/api/auth/login`, payload);
+  return publicApi.post<AuthResponse>("/api/auth/login", payload);
+}
+
+export function refreshAccessToken() {
+  return publicApi.post<AuthResponse>("/api/auth/refresh");
+}
+
+export function logoutUser() {
+  return publicApi.post("/api/auth/logout");
 }
 
 export function getApiErrorMessage(error: unknown, fallback: string) {

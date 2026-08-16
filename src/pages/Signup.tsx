@@ -11,6 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import { getApiErrorMessage, signupUser } from "../services/auth";
 
 export function Signup() {
@@ -142,7 +143,12 @@ export function Signup() {
 
           <Typography color="text.secondary" sx={{ textAlign: "center" }}>
             Already have an account?{" "}
-            <Link href="login" underline="hover" sx={{ fontWeight: 700 }}>
+            <Link
+              component={RouterLink}
+              to="/login"
+              underline="hover"
+              sx={{ fontWeight: 700 }}
+            >
               Log in
             </Link>
           </Typography>

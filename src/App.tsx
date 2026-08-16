@@ -1,7 +1,12 @@
 import { RoutingProvider } from "./providers/routing";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
-  return <RoutingProvider />;
+  return (
+    <AuthProvider>
+      <RoutingProvider />
+    </AuthProvider>
+  );
 }
 
 export default App;

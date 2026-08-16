@@ -5,27 +5,27 @@ import {
   Alert,
   Box,
   Button,
-  Checkbox,
-  FormControlLabel,
   Link,
   Paper,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
-import { getApiErrorMessage, loginUser } from "../services/auth";
-import { useNavigate } from "react-router-dom";
+import { getApiErrorMessage } from "../services/auth";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 
 export function Login() {
   const [formValues, setFormValues] = useState({
     email: "",
     password: "",
   });
-  const [rememberMe, setRememberMe] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -36,29 +36,21 @@ export function Login() {
     }));
   }
 
-  function handleRememberMeChange(event: ChangeEvent<HTMLInputElement>) {
-    setRememberMe(event.target.checked);
-  }
-
   async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setErrorMessage("");
     setIsSubmitting(true);
 
     try {
-      const response = await loginUser(formValues);
-      const token = response.data?.token;
-
-      if (typeof token === "string") {
-        const storage = rememberMe ? localStorage : sessionStorage;
-        storage.setItem("token", token);
-      }
+      await login(formValues);
 
       setFormValues({
         email: "",
         password: "",
       });
-      navigate("/home");
+      const destination =
+        (location.state as { from?: string } | null)?.from ?? "/home";
+      navigate(destination, { replace: true });
     } catch (error) {
       setErrorMessage(
         getApiErrorMessage(
@@ -129,32 +121,6 @@ export function Login() {
               required
             />
 
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={rememberMe}
-                    onChange={handleRememberMeChange}
-                  />
-                }
-                label={
-                  <Typography variant="body2" color="text.secondary">
-                    Remember me
-                  </Typography>
-                }
-              />
-              <Link href="#" underline="hover" sx={{ fontWeight: 700 }}>
-                Forgot password?
-              </Link>
-            </Box>
-
             <Button
               fullWidth
               disabled={isSubmitting}
@@ -169,7 +135,12 @@ export function Login() {
 
           <Typography color="text.secondary" sx={{ textAlign: "center" }}>
             New to WeChat?{" "}
-            <Link href="signup" underline="hover" sx={{ fontWeight: 700 }}>
+            <Link
+              component={RouterLink}
+              to="/signup"
+              underline="hover"
+              sx={{ fontWeight: 700 }}
+            >
               Create account
             </Link>
           </Typography>
