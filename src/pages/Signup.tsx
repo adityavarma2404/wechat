@@ -67,7 +67,7 @@ export function Signup() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        bgcolor: "#f4f7fb",
+        background: "linear-gradient(135deg, #DDDCD7 0%, #D8DDDC 100%)",
         px: 2,
         py: 4,
       }}
@@ -77,9 +77,9 @@ export function Signup() {
         sx={{
           width: "100%",
           maxWidth: 420,
-          borderRadius: 3,
-          border: "1px solid",
-          borderColor: "divider",
+          borderRadius: 4,
+          border: "1px solid rgba(226, 232, 240, .9)",
+          boxShadow: "0 20px 50px rgba(48, 53, 64, .08)",
           p: { xs: 3, sm: 4 },
         }}
       >
@@ -135,7 +135,7 @@ export function Signup() {
               size="large"
               type="submit"
               variant="contained"
-              sx={{ py: 1.25, textTransform: "none", fontWeight: 700 }}
+              sx={{ py: 1.35, bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}
             >
               {isSubmitting ? "Signing up..." : "Sign up"}
             </Button>

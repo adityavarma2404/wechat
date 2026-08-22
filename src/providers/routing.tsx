@@ -20,7 +20,11 @@ const Home = lazy(() =>
 );
 
 function LoadingScreen() {
-  return <div role="status">Loading...</div>;
+  return (
+    <div className="app-loading" role="status">
+      <span className="app-loading__dot" /> Loading...
+    </div>
+  );
 }
 
 function ProtectedRoute({ children }: { children: ReactNode }) {

@@ -1,11 +1,16 @@
 import { RoutingProvider } from "./providers/routing";
 import { AuthProvider } from "./context/AuthContext";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { appTheme } from "./theme";
 
 function App() {
   return (
-    <AuthProvider>
-      <RoutingProvider />
-    </AuthProvider>
+    <ThemeProvider theme={appTheme}>
+      <CssBaseline />
+      <AuthProvider>
+        <RoutingProvider />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
