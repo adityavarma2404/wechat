@@ -15,6 +15,8 @@ export type LoginPayload = {
 export type User = {
   _id: number | string;
   email: string;
+  fullName: string;
+  profileImage: string;
 };
 
 export type AuthResponse = {

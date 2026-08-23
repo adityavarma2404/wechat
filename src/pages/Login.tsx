@@ -127,7 +127,11 @@ export function Login() {
               size="large"
               type="submit"
               variant="contained"
-              sx={{ py: 1.35, bgcolor: "primary.main", "&:hover": { bgcolor: "primary.dark" } }}
+              sx={{
+                py: 1.35,
+                bgcolor: "primary.main",
+                "&:hover": { bgcolor: "primary.dark" },
+              }}
             >
               {isSubmitting ? "Logging in..." : "Log in"}
             </Button>

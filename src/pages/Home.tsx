@@ -1,10 +1,14 @@
-import { Autocomplete, Box, IconButton, TextField } from "@mui/material";
-import LogoutIcon from "@mui/icons-material/Logout";
+import { Box } from "@mui/material";
 
 import { ContactsList } from "../components/ContactsList";
 import { ChatWindow } from "../components/ChatWindow";
+import { UserProfile } from "../components/UserProfile";
+import { useAuth } from "../context/useAuth";
+import { UserSearchInput } from "../components/UserSearchInput";
 
 export function Home() {
+  const { user } = useAuth();
+  console.log("User", user);
   return (
     <Box
       sx={{
@@ -44,57 +48,8 @@ export function Home() {
             flexShrink: 0,
           }}
         >
-          <div className="d-flex align-items-center justify-content-between mb-3">
-            <div>
-              <img
-                src="https://2pick.app/storage/default-avatar.webp"
-                width={50}
-                height={50}
-                style={{ borderRadius: "50%", marginRight: "10px" }}
-              />
-              <Box
-                component="span"
-                sx={{
-                  color: "#E8E2D8",
-                  fontFamily: '"Trebuchet MS", sans-serif',
-                  fontWeight: 700,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                Aditya Mudunuri
-              </Box>
-            </div>
-            <IconButton
-              sx={{
-                color: "#AAAEB2",
-                "&:hover": { color: "#E0A4A8", bgcolor: "#35414C" },
-              }}
-            >
-              <LogoutIcon fontSize="small" color="primary" />
-            </IconButton>
-          </div>
-          <Autocomplete
-            id="search-user"
-            freeSolo
-            resetHighlightOnMouseLeave
-            options={[1, 2, 3, 4, 5]}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                size="small"
-                placeholder="Search username"
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    backgroundColor: "#35414C",
-                    borderRadius: "20px",
-                    color: "#E8E2D8",
-                    "& fieldset": { borderColor: "#46535F" },
-                    "& input::placeholder": { color: "#AEB4B8", opacity: 1 },
-                  },
-                }}
-              />
-            )}
-          />
+          <UserProfile userName={user?.fullName} />
+          <UserSearchInput />
           <hr
             style={{
               margin: "20px 0 0",

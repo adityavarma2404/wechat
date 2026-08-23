@@ -1,0 +1,40 @@
+import { Box, IconButton } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+
+type UserProfileProps = {
+  userName?: string;
+};
+
+export function UserProfile({ userName }: UserProfileProps) {
+  return (
+    <div className="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <img
+          src="https://2pick.app/storage/default-avatar.webp"
+          width={50}
+          height={50}
+          style={{ borderRadius: "50%", marginRight: "10px" }}
+        />
+        <Box
+          component="span"
+          sx={{
+            color: "#E8E2D8",
+            fontFamily: '"Trebuchet MS", sans-serif',
+            fontWeight: 700,
+            letterSpacing: "-0.01em",
+          }}
+        >
+          {userName}
+        </Box>
+      </div>
+      <IconButton
+        sx={{
+          color: "#AAAEB2",
+          "&:hover": { color: "#E0A4A8", bgcolor: "#35414C" },
+        }}
+      >
+        <LogoutIcon fontSize="small" color="primary" />
+      </IconButton>
+    </div>
+  );
+}
