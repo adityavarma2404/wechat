@@ -8,8 +8,10 @@ export function ChatWindow() {
         width: "100%",
         flex: 1,
         backgroundColor: "#C8C1BA",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
       }}
-      className="d-flex flex-column align-items-center"
     >
       <Box
         sx={{
@@ -54,12 +56,17 @@ export function ChatWindow() {
         }}
       >
         <Box
-          sx={{ height: "95%", width: "600px" }}
-          className="d-flex flex-column justify-content-end"
+          sx={{
+            height: "95%",
+            width: "600px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "flex-end",
+          }}
         >
           <Box
-            className="align-self-end"
             sx={{
+              alignSelf: "flex-end",
               borderRadius: "10px 10px 0px 10px",
               backgroundColor: "#756A91",
               color: "#F1EFE9",
@@ -71,8 +78,8 @@ export function ChatWindow() {
             Hi
           </Box>
           <Box
-            className="align-self-start"
             sx={{
+              alignSelf: "flex-start",
               borderRadius: "10px 10px 10px 0px",
               backgroundColor: "#DED6CE",
               color: "#292D33",
@@ -84,8 +91,8 @@ export function ChatWindow() {
             Hello there
           </Box>
           <Box
-            className="align-self-end"
             sx={{
+              alignSelf: "flex-end",
               borderRadius: "10px 10px 0px 10px",
               backgroundColor: "#756A91",
               color: "#F1EFE9",
@@ -97,8 +104,8 @@ export function ChatWindow() {
             How are you?
           </Box>
           <Box
-            className="align-self-start"
             sx={{
+              alignSelf: "flex-start",
               borderRadius: "10px 10px 10px 0px",
               backgroundColor: "#DED6CE",
               color: "#292D33",
@@ -118,8 +125,10 @@ export function ChatWindow() {
           flexShrink: 0,
           backgroundColor: "#D9D2CB",
           borderTop: "1px solid #B8AFA7",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
         }}
-        className="d-flex justify-content-center align-items-center"
       >
         <TextareaAutosize
           minRows={1}
@@ -138,8 +147,8 @@ export function ChatWindow() {
             backgroundColor: "#C8C0B8",
             color: "#292D33",
             fontFamily: "inherit",
+            marginRight: 16,
           }}
-          className="me-3"
         />
         <IconButton
           sx={{

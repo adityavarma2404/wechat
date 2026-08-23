@@ -7,7 +7,14 @@ type UserProfileProps = {
 
 export function UserProfile({ userName }: UserProfileProps) {
   return (
-    <div className="d-flex align-items-center justify-content-between mb-3">
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        mb: 2,
+      }}
+    >
       <div>
         <img
           src="https://2pick.app/storage/default-avatar.webp"
@@ -35,6 +42,6 @@ export function UserProfile({ userName }: UserProfileProps) {
       >
         <LogoutIcon fontSize="small" color="primary" />
       </IconButton>
-    </div>
+    </Box>
   );
 }
