@@ -15,7 +15,7 @@ export function UserProfile({ userName }: UserProfileProps) {
         mb: 2,
       }}
     >
-      <div>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
         <img
           src="https://2pick.app/storage/default-avatar.webp"
           width={50}
@@ -33,7 +33,7 @@ export function UserProfile({ userName }: UserProfileProps) {
         >
           {userName}
         </Box>
-      </div>
+      </Box>
       <IconButton
         sx={{
           color: "#AAAEB2",

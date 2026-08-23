@@ -13,7 +13,7 @@ export type LoginPayload = {
 };
 
 export type User = {
-  _id: number | string;
+  _id: string;
   email: string;
   fullName: string;
   profileImage: string;
@@ -24,8 +24,12 @@ export type AuthResponse = {
   user: User;
 };
 
+type MessageResponse = {
+  message: string;
+};
+
 export function signupUser(payload: SignupPayload) {
-  return publicApi.post("/api/auth/signup", payload);
+  return publicApi.post<MessageResponse>("/api/auth/signup", payload);
 }
 
 export function loginUser(payload: LoginPayload) {

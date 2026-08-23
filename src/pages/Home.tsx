@@ -20,7 +20,7 @@ export function Home() {
         background: "linear-gradient(145deg, #B9B7B5 0%, #CFCCC7 100%)",
         px: 2,
         py: 4,
-        backgroundImage: 'url("/ChatWindowWallpaper.png")',
+        backgroundImage: 'url("/ChatWindowWallpaper.webp")',
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
