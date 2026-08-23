@@ -5,23 +5,26 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "../hooks/useDebounce";
 import type { User } from "../services/auth";
 import { searchUsers } from "../services/users";
 
 export function UserSearchInput() {
   const [inputValue, setInputValue] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const debouncedInput = useDebounce(inputValue, 350);
+  const requestControllerRef = useRef<AbortController | null>(null);
+  const debouncedQuery = useDebounce(searchQuery, 350);
 
   useEffect(() => {
-    const email = debouncedInput.trim();
+    const email = debouncedQuery.trim();
 
     if (!email) return;
 
     const controller = new AbortController();
+    requestControllerRef.current = controller;
 
     async function loadUsers() {
       try {
@@ -33,37 +36,41 @@ export function UserSearchInput() {
           setUsers([]);
         }
       } finally {
-        if (!controller.signal.aborted) setIsLoading(false);
+        if (!controller.signal.aborted) {
+          requestControllerRef.current = null;
+          setIsLoading(false);
+        }
       }
     }
 
     loadUsers();
 
-    return () => controller.abort();
-  }, [debouncedInput]);
+    return () => {
+      controller.abort();
+      if (requestControllerRef.current === controller) {
+        requestControllerRef.current = null;
+      }
+    };
+  }, [debouncedQuery]);
 
   return (
-    <Autocomplete<User, false, false, true>
+    <Autocomplete<User, false, false, false>
       id="search-user"
-      freeSolo
       resetHighlightOnMouseLeave
       options={users}
       inputValue={inputValue}
       loading={isLoading}
       filterOptions={(options) => options}
-      onInputChange={(_, value) => {
+      onInputChange={(_, value, reason) => {
+        requestControllerRef.current?.abort();
+        requestControllerRef.current = null;
         setInputValue(value);
         setUsers([]);
-        setIsLoading(Boolean(value.trim()));
+        setSearchQuery(reason === "input" ? value : "");
+        setIsLoading(reason === "input" && Boolean(value.trim()));
       }}
-      getOptionLabel={(option) =>
-        typeof option === "string" ? option : option.email
-      }
-      isOptionEqualToValue={(option, value) =>
-        typeof option !== "string" &&
-        typeof value !== "string" &&
-        option._id === value._id
-      }
+      getOptionLabel={(option) => option.email}
+      isOptionEqualToValue={(option, value) => option._id === value._id}
       renderOption={(props, option) => {
         const { key, ...optionProps } = props;
 
