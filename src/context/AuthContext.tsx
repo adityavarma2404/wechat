@@ -23,7 +23,6 @@ type RetryableRequestConfig = InternalAxiosRequestConfig & {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const accessTokenRef = useRef<string | null>(null);
@@ -31,7 +30,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateAccessToken = useCallback((token: string | null) => {
     accessTokenRef.current = token;
-    setAccessToken(token);
   }, []);
 
   const clearAuth = useCallback(() => {
@@ -43,7 +41,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data } = await refreshAccessToken();
       updateAccessToken(data.accessToken);
-      setUser(data.user);
       return data.accessToken;
     } catch (error) {
       clearAuth();
@@ -133,14 +130,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      accessToken,
       user,
-      isAuthenticated: accessToken !== null,
+      isAuthenticated: user !== null,
       isInitializing,
       login,
       logout,
     }),
-    [accessToken, user, isInitializing, login, logout],
+    [user, isInitializing, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
