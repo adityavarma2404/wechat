@@ -87,7 +87,10 @@ export function AppRoutes() {
               <Home />
             </ProtectedRoute>
           }
-        />
+        >
+          {" "}
+          <Route path="chat/:chatId" />{" "}
+        </Route>
         <Route path="*" element={<div>Page not found</div>} />
       </Routes>
     </Suspense>

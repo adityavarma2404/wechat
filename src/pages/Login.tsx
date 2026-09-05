@@ -14,6 +14,7 @@ import {
 import { getApiErrorMessage } from "../services/auth";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import "./pages.scss";
 
 export function Login() {
   const [formValues, setFormValues] = useState({
@@ -64,40 +65,19 @@ export function Login() {
   }
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        width: "100%",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "linear-gradient(135deg, #DDDCD7 0%, #D8DDDC 100%)",
-        px: 2,
-        py: 4,
-      }}
-    >
-      <Paper
-        elevation={0}
-        sx={{
-          width: "100%",
-          maxWidth: 420,
-          borderRadius: 4,
-          border: "1px solid rgba(226, 232, 240, .9)",
-          boxShadow: "0 20px 50px rgba(48, 53, 64, .08)",
-          p: { xs: 3, sm: 4 },
-        }}
-      >
-        <Stack spacing={3}>
+    <Box className="auth-page auth-page--login">
+      <Paper elevation={0} className="auth-page__card">
+        <Stack className="auth-page__content">
           <Box>
-            <Typography variant="h4" sx={{ fontWeight: 700 }}>
+            <Typography variant="h4" className="auth-page__title">
               Welcome back
             </Typography>
-            <Typography color="text.secondary" sx={{ mt: 1 }}>
+            <Typography className="auth-page__subtitle">
               Log in to continue your conversations.
             </Typography>
           </Box>
 
-          <Stack component="form" spacing={2.25} onSubmit={handleSubmit}>
+          <Stack component="form" className="auth-page__form" onSubmit={handleSubmit}>
             {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
 
             <TextField
@@ -127,23 +107,19 @@ export function Login() {
               size="large"
               type="submit"
               variant="contained"
-              sx={{
-                py: 1.35,
-                bgcolor: "primary.main",
-                "&:hover": { bgcolor: "primary.dark" },
-              }}
+              className="auth-page__submit"
             >
               {isSubmitting ? "Logging in..." : "Log in"}
             </Button>
           </Stack>
 
-          <Typography color="text.secondary" sx={{ textAlign: "center" }}>
+          <Typography className="auth-page__footer">
             New to WeChat?{" "}
             <Link
               component={RouterLink}
               to="/signup"
               underline="hover"
-              sx={{ fontWeight: 700 }}
+              className="auth-page__link"
             >
               Create account
             </Link>

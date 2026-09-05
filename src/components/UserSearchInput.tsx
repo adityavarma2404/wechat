@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import {
   Autocomplete,
   Avatar,
@@ -5,18 +6,41 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDebounce } from "../hooks/useDebounce";
 import type { User } from "../services/auth";
+import { useOpenConversationMutation } from "../services/conversationsApi";
 import { searchUsers } from "../services/users";
+import "./components.scss";
+// import { setSelectedConversationId } from "../store/chatSlice";
+// import { useAppDispatch } from "../store/hooks";
 
 export function UserSearchInput() {
+  // const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const requestControllerRef = useRef<AbortController | null>(null);
   const debouncedQuery = useDebounce(searchQuery, 350);
+  const [openConversation, { isLoading: isOpeningConversation }] =
+    useOpenConversationMutation();
+
+  async function handleUserSelected(user: User | null) {
+    if (!user) return;
+
+    try {
+      const { conversationId } = await openConversation(user._id).unwrap();
+      // dispatch(setSelectedConversationId(conversation._id));
+      navigate(`chat/${conversationId}`);
+      setInputValue("");
+      setSearchQuery("");
+      setUsers([]);
+    } catch (error) {
+      console.error("Unable to open conversation:", error);
+    }
+  }
 
   useEffect(() => {
     const email = debouncedQuery.trim();
@@ -55,12 +79,16 @@ export function UserSearchInput() {
 
   return (
     <Autocomplete<User, false, false, false>
+      className="user-search"
       id="search-user"
       resetHighlightOnMouseLeave
       options={users}
       inputValue={inputValue}
-      loading={isLoading}
+      loading={isLoading || isOpeningConversation}
       filterOptions={(options) => options}
+      onChange={(_, user) => {
+        void handleUserSelected(user);
+      }}
       onInputChange={(_, value, reason) => {
         requestControllerRef.current?.abort();
         requestControllerRef.current = null;
@@ -79,12 +107,12 @@ export function UserSearchInput() {
             component="li"
             key={key}
             {...optionProps}
-            sx={{ display: "flex", gap: 1.5, alignItems: "center" }}
+            className={`user-search__option ${optionProps.className ?? ""}`}
           >
             <Avatar
               src={option.profileImage || undefined}
               alt={option.fullName}
-              sx={{ width: 36, height: 36, color: "#29333D" }}
+              className="user-search__avatar"
             >
               {option.fullName?.charAt(0).toUpperCase()}
             </Avatar>
@@ -97,15 +125,6 @@ export function UserSearchInput() {
           {...params}
           size="small"
           placeholder="Search username"
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              backgroundColor: "#35414C",
-              borderRadius: "20px",
-              color: "#E8E2D8",
-              "& fieldset": { borderColor: "#46535F" },
-              "& input::placeholder": { color: "#AEB4B8", opacity: 1 },
-            },
-          }}
         />
       )}
     />

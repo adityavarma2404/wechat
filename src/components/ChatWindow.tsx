@@ -1,161 +1,93 @@
 import { Box, IconButton, TextareaAutosize } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
+import { useState, type KeyboardEvent } from "react";
+import { useParams } from "react-router-dom";
+import "./components.scss";
+
+type ChatMessage = {
+  id: number;
+  text: string;
+  direction: "sent" | "received";
+};
+
+const initialMessages: ChatMessage[] = [
+  { id: 1, text: "Hi", direction: "sent" },
+  { id: 2, text: "Hello there", direction: "received" },
+  { id: 3, text: "How are you?", direction: "sent" },
+  { id: 4, text: "I am good, what about you?", direction: "received" },
+];
 
 export function ChatWindow() {
+  const { chatId } = useParams<{ chatId: string }>();
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState(initialMessages);
+
+  function handleSendMessage() {
+    const text = message.trim();
+
+    if (!text || !chatId) return;
+
+    setMessages((currentMessages) => [
+      ...currentMessages,
+      { id: Date.now(), text, direction: "sent" },
+    ]);
+    setMessage("");
+  }
+
+  function handleMessageKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSendMessage();
+    }
+  }
+
   return (
-    <Box
-      sx={{
-        width: "100%",
-        flex: 1,
-        backgroundColor: "#C8C1BA",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <Box
-        sx={{
-          width: "100%",
-          height: "72px",
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          padding: "0 28px",
-          backgroundColor: "#D9D2CB",
-        }}
-      >
+    <Box className="chat-window">
+      <Box className="chat-window__header">
         <img
+          className="chat-window__avatar"
           src="https://2pick.app/storage/default-avatar.webp"
           width={50}
           height={50}
-          style={{ borderRadius: "50%", marginRight: "10px" }}
+          alt=""
         />
-        <Box
-          component="span"
-          sx={{ fontWeight: 700, color: "text.primary", mr: 1 }}
-        >
+        <Box component="span" className="chat-window__name">
           Adha
         </Box>
         <Box
           component="span"
           aria-label="Online"
-          sx={{
-            display: "inline-block",
-            width: 10,
-            height: 10,
-            borderRadius: "50%",
-            backgroundColor: "#6F9981",
-          }}
+          className="chat-window__online-indicator"
         />
       </Box>
-      <Box
-        sx={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-        }}
-      >
-        <Box
-          sx={{
-            height: "95%",
-            width: "600px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-end",
-          }}
-        >
-          <Box
-            sx={{
-              alignSelf: "flex-end",
-              borderRadius: "10px 10px 0px 10px",
-              backgroundColor: "#756A91",
-              color: "#F1EFE9",
-              padding: "10px 20px",
-              marginBottom: "10px",
-              boxShadow: "0 5px 14px rgba(55, 48, 73, .16)",
-            }}
-          >
-            Hi
-          </Box>
-          <Box
-            sx={{
-              alignSelf: "flex-start",
-              borderRadius: "10px 10px 10px 0px",
-              backgroundColor: "#DED6CE",
-              color: "#292D33",
-              padding: "10px 20px",
-              marginBottom: "10px",
-              boxShadow: "0 3px 12px rgba(48, 53, 64, .06)",
-            }}
-          >
-            Hello there
-          </Box>
-          <Box
-            sx={{
-              alignSelf: "flex-end",
-              borderRadius: "10px 10px 0px 10px",
-              backgroundColor: "#756A91",
-              color: "#F1EFE9",
-              padding: "10px 20px",
-              marginBottom: "10px",
-              boxShadow: "0 5px 14px rgba(55, 48, 73, .16)",
-            }}
-          >
-            How are you?
-          </Box>
-          <Box
-            sx={{
-              alignSelf: "flex-start",
-              borderRadius: "10px 10px 10px 0px",
-              backgroundColor: "#DED6CE",
-              color: "#292D33",
-              padding: "10px 20px",
-              marginBottom: "10px",
-              boxShadow: "0 3px 12px rgba(48, 53, 64, .06)",
-            }}
-          >
-            I am good, what about you?
-          </Box>
+      <Box className="chat-window__body">
+        <Box className="chat-window__messages">
+          {messages.map(({ id, text, direction }) => (
+            <Box
+              key={id}
+              className={`chat-window__message chat-window__message--${direction}`}
+            >
+              {text}
+            </Box>
+          ))}
         </Box>
       </Box>
-      <Box
-        sx={{
-          height: "80px",
-          width: "100%",
-          flexShrink: 0,
-          backgroundColor: "#D9D2CB",
-          borderTop: "1px solid #B8AFA7",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      <Box className="chat-window__composer">
         <TextareaAutosize
           minRows={1}
           maxRows={2}
           aria-label="maximum height"
           placeholder="write something..."
-          style={{
-            width: 500,
-            border: "1px solid #B8AFA7",
-            borderRadius: "20px",
-            resize: "none",
-            outline: "none",
-            lineHeight: "20px",
-            boxSizing: "border-box",
-            padding: "10px 20px",
-            backgroundColor: "#C8C0B8",
-            color: "#292D33",
-            fontFamily: "inherit",
-            marginRight: 16,
-          }}
+          className="chat-window__input"
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
+          onKeyDown={handleMessageKeyDown}
         />
         <IconButton
-          sx={{
-            bgcolor: "primary.main",
-            color: "#F1EFE9",
-            "&:hover": { bgcolor: "primary.dark" },
-          }}
+          className="chat-window__send"
+          aria-label="Send message"
+          disabled={!message.trim() || !chatId}
+          onClick={handleSendMessage}
         >
           <SendIcon fontSize="small" />
         </IconButton>
