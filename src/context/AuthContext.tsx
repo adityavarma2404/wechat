@@ -16,6 +16,7 @@ import {
   type User,
 } from "../services/auth";
 import { api } from "../services/api";
+import { updateSocketAccessToken } from "../services/socket";
 import { AuthContext } from "./auth-context";
 
 type RetryableRequestConfig = InternalAxiosRequestConfig & {
@@ -30,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateAccessToken = useCallback((token: string | null) => {
     accessTokenRef.current = token;
+    updateSocketAccessToken(token);
   }, []);
 
   const clearAuth = useCallback(() => {

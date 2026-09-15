@@ -1,37 +1,95 @@
 import { Box, IconButton, TextareaAutosize } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { useState, type KeyboardEvent } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
+import { socket } from "../services/socket";
 import "./components.scss";
 
 type ChatMessage = {
-  id: number;
-  text: string;
-  direction: "sent" | "received";
+  _id: string;
+  conversationId: string;
+  senderId: string;
+  type: "text" | "image" | "video" | "file" | "audio";
+  content: string;
+  createdAt: string;
 };
 
-const initialMessages: ChatMessage[] = [
-  { id: 1, text: "Hi", direction: "sent" },
-  { id: 2, text: "Hello there", direction: "received" },
-  { id: 3, text: "How are you?", direction: "sent" },
-  { id: 4, text: "I am good, what about you?", direction: "received" },
-];
+type SocketAcknowledgement = {
+  success: boolean;
+  error?: string;
+};
 
 export function ChatWindow() {
   const { chatId } = useParams<{ chatId: string }>();
+  const { user } = useAuth();
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState(initialMessages);
+  const [messagesByConversation, setMessagesByConversation] = useState<
+    Record<string, ChatMessage[]>
+  >({});
+  const [isSending, setIsSending] = useState(false);
+  const messages = chatId ? (messagesByConversation[chatId] ?? []) : [];
+
+  useEffect(() => {
+    if (!chatId) return;
+
+    function handleCreatedMessage(createdMessage: ChatMessage) {
+      if (createdMessage.conversationId !== chatId) return;
+
+      setMessagesByConversation((currentConversations) => {
+        const currentMessages = currentConversations[chatId] ?? [];
+
+        if (currentMessages.some(({ _id }) => _id === createdMessage._id)) {
+          return currentConversations;
+        }
+
+        return {
+          ...currentConversations,
+          [chatId]: [...currentMessages, createdMessage],
+        };
+      });
+    }
+
+    socket.on("message:created", handleCreatedMessage);
+    socket.emit(
+      "conversation:join",
+      { conversationId: chatId },
+      (response: SocketAcknowledgement) => {
+        if (!response.success) {
+          console.error("Unable to join conversation:", response.error);
+        }
+      },
+    );
+
+    return () => {
+      socket.off("message:created", handleCreatedMessage);
+      socket.emit("conversation:leave", { conversationId: chatId });
+    };
+  }, [chatId]);
 
   function handleSendMessage() {
-    const text = message.trim();
+    const content = message.trim();
 
-    if (!text || !chatId) return;
+    if (!content || !chatId || isSending) return;
 
-    setMessages((currentMessages) => [
-      ...currentMessages,
-      { id: Date.now(), text, direction: "sent" },
-    ]);
-    setMessage("");
+    setIsSending(true);
+    socket.timeout(5000).emit(
+      "message:send",
+      { conversationId: chatId, content },
+      (timeoutError: Error | null, response?: SocketAcknowledgement) => {
+        setIsSending(false);
+
+        if (timeoutError || !response?.success) {
+          console.error(
+            "Unable to send message:",
+            response?.error ?? timeoutError?.message,
+          );
+          return;
+        }
+
+        setMessage("");
+      },
+    );
   }
 
   function handleMessageKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
@@ -62,12 +120,14 @@ export function ChatWindow() {
       </Box>
       <Box className="chat-window__body">
         <Box className="chat-window__messages">
-          {messages.map(({ id, text, direction }) => (
+          {messages.map((chatMessage) => (
             <Box
-              key={id}
-              className={`chat-window__message chat-window__message--${direction}`}
+              key={chatMessage._id}
+              className={`chat-window__message chat-window__message--${
+                chatMessage.senderId === user?._id ? "sent" : "received"
+              }`}
             >
-              {text}
+              {chatMessage.content}
             </Box>
           ))}
         </Box>
@@ -86,7 +146,7 @@ export function ChatWindow() {
         <IconButton
           className="chat-window__send"
           aria-label="Send message"
-          disabled={!message.trim() || !chatId}
+          disabled={!message.trim() || !chatId || isSending}
           onClick={handleSendMessage}
         >
           <SendIcon fontSize="small" />
