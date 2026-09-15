@@ -1,5 +1,36 @@
-html,
+html, body, #root {
+  min-height: 100%;
+  margin: 0;
+}
+
 body {
-    margin: 0;
-    padding: 0;
+  min-width: 320px;
+  background: #c9c6c2;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+
+::selection {
+  color: #f1efe9;
+  background: #6673a6;
+}
+
+.app-loading {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #747984;
+  font-weight: 600;
+}
+
+.app-loading__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6673a6;
+  box-shadow: 0 0 0 6px #e8e9f0;
 }
