@@ -56,12 +56,11 @@ jobs:
 
       - name: Audit production and development dependencies
         id: security-audit
-        continue-on-error: true
         run: npm audit --package-lock-only --include=dev --audit-level=low
 
       - name: Report advisory audit failure
-        if: ${{ steps.security-audit.outcome == 'failure' }}
+        if: ${{ failure() && steps.security-audit.outcome == 'failure' }}
         run: |
           echo "::warning::Dependency audit failed. Review the audit logs for vulnerabilities or registry errors. This check is advisory."
           echo "### Dependency security audit" >> "$GITHUB_STEP_SUMMARY"
-          echo "The audit reported vulnerabilities or could not complete. Review the audit step logs. This result does not block merging." >> "$GITHUB_STEP_SUMMARY"
+          echo "The audit reported vulnerabilities or could not complete. Review the audit step logs. This check is non-blocking when only Lint and build is required by branch protection." >> "$GITHUB_STEP_SUMMARY"

@@ -19,8 +19,11 @@ A separate **Dependency security audit** job runs
 `npm audit --package-lock-only --include=dev --audit-level=low`. It checks the
 lockfile's production and development dependencies against npm's known security
 advisories and reports low, moderate, high, or critical vulnerabilities.
-The audit step uses `continue-on-error: true`: audit failures produce a warning
-and job summary while allowing the job to succeed. This check is advisory.
+Audit failures produce a warning annotation and job summary, and leave the audit
+check visibly failed (red). GitHub Actions does not provide a yellow warning job
+conclusion. This check is advisory because it is not required by branch protection,
+not because its failure is hidden. The overall workflow can show as failed while
+merging remains allowed when the required **Lint and build** check passes.
 It runs independently so peer dependency failures do not prevent the audit.
 The audit requires access to the npm registry and does not automatically fix or
 upgrade packages. Passing means no reported vulnerabilities at that time, not a
